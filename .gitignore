@@ -1,0 +1,13 @@
+assets/css/doctor_dashboard.css
+doctor_history.php
+doctor_upcoming.php
+config/email_config.php
+vendor/
+auth/
+reports/
+patients/
+doctors/
+admin
+add_medical_history.php
+composer.json
+composer.lock

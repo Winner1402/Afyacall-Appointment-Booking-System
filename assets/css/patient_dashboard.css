@@ -1,0 +1,600 @@
+
+    /* General reset */
+   .page-header {
+    position: fixed;           
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;              
+    background: white;
+    color: #022407ff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+.logo {
+    height: 60px;
+    width: auto;
+    margin-right: 40px;
+    border-radius: 50%;
+}
+
+.page-header h1 {
+    font-size: 20px;
+    font-weight: 400;
+   padding-left: 60%;
+   
+}
+
+.logout-btn {
+    text-decoration: none;
+    background:linear-gradient(135deg, #127137, #106546, #00e6a8);
+    color: #fff;
+    padding: 8px 30px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);  
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+    * { margin: 0; 
+        padding: 0;
+        box-sizing: border-box; 
+        font-family: Arial, sans-serif;
+ }
+    body { 
+        display: flex;
+        height: 100vh;
+     }
+html, body {
+    height: 100%;
+    margin: 0;
+}
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.main-content {
+    flex: 1;
+    background: #ecf0f1;
+    padding: 20px;
+    margin-top: 70px;      
+    margin-left: 250px;     
+    overflow-y: auto;
+    padding-bottom: 100px;
+}
+
+    /* Sidebar */
+  /* Sidebar */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, #127137, #106546, #00e6a8);
+    color: #fff;
+    height: 100vh;
+    padding-top: 20px;
+    position: fixed;
+    top: 60px; /* below header */
+    left: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar a {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 20px;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.sidebar a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+   
+header h1 { font-size: 24px; }
+     
+ 
+/* Cards layout */
+.cards { 
+    display: flex; 
+    gap: 20px; 
+    flex-wrap: wrap; 
+}
+
+/* Individual card styling */
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    flex: 1 1 calc(33.333% - 20px); /* 3 cards per row with gap */
+    min-width: 250px;
+    max-width: 350px; /* optional max width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;  
+    flex-direction: column;
+    height: 250px;
+    top: 20px;
+}
+.card-icon {
+    width: 60px;       /* adjust size as needed */
+    height: 60px;
+    margin-bottom: 15px;
+}
+
+
+.card:hover { transform: translateY(-5px); }
+
+    .card { background: #fff; padding: 20px; border-radius: 8px; flex: 1; min-width: 250px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
+    .card:hover { transform: translateY(-5px); }
+    .card i { font-size: 40px; margin-bottom: 15px; color: #27ae60; }
+    .card h3 { font-size: 18px; margin-bottom: 10px; color: #2c3e50; }
+    .card p { margin-bottom: 10px; font-size: 14px; color: #34495e; }
+    .card a { display: inline-block; margin-top: 10px; color: #2980b9; text-decoration: none; font-weight: bold; }
+    .card a:hover { text-decoration: underline; }
+
+
+    @media (max-width: 768px) {
+    .card {
+        flex: 1 1 calc(50% - 20px); /* 2 cards per row on tablet */
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        flex: 1 1 100%; /* 1 card per row on mobile */
+    }
+}
+
+  /* Copyright bar at the bottom */
+.copyright-bar {
+    background: transparent;
+    color: darkgreen;
+    text-align: center;
+    padding: 15px 0;
+ justify-content: center;
+    font-size: 14px;
+    width: calc(100% - 200px);
+    margin-left: 200px;
+    position: fixed;     
+    bottom: 0;
+    left: 50px;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+ 
+
+    /* =====PROFILE UPDATE PAGE ===== */
+        /* General reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg,  #ffffff);
+            color:  #022407ff;
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            z-index: 1000;
+        }
+
+         .logo {
+            height: 60px;
+            width: auto;
+            border-radius: 1%;
+            margin-right: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 20px;
+            flex: 1;
+            padding-left: 50%;
+            text-align: center;
+            color: #022407ff;
+        }
+
+       
+.btn-primary {
+    background: linear-gradient(90deg, #00a859, #00c97f);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #78c77d;
+  transform: translateY(-2px); /* subtle lift effect */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #127137, #106546, #00e6a8);
+            color: #fff;
+            height: 100vh;
+            padding-top: 20px;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+/* Center the main content */
+.main-content {
+    display: flex;
+    justify-content: center;  
+    align-items: center; 
+    padding: 30px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 100vh;
+}
+
+/* Profile form container */
+.profile-form {
+    background: #f9f9f9;       
+    padding: 35px 40px;        
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 700px;          
+    width: 100%;   
+    margin: 0 auto;  
+}
+.profile-form .form-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #127137;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+}
+
+/* Form group styling for spacing */
+.profile-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 15px;
+}
+
+.profile-form input,
+.profile-form select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Focus effect for inputs */
+.profile-form input:focus,
+.profile-form select:focus {
+    outline: none;
+    border-color: #127137;
+    box-shadow: 0 0 5px rgba(18, 113, 55, 0.3);
+}
+
+/* Space between each field */
+.profile-form label + input,
+.profile-form label + select {
+    margin-bottom: 20px;
+}
+
+/* Submit button styling */
+.profile-form button[type="submit"] {
+    padding: 12px 25px;
+    background: #127137;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+}
+
+.profile-form button[type="submit"]:hover {
+    background: #0e5d2c;
+    transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 700px) {
+    .profile-form {
+        padding: 20px;
+        margin: 15px;
+    }
+}
+
+ /* ===== APPOINTMENT PAGE ===== */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.main-content h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #127137;
+    text-align: center;
+}
+
+ .appointments-table {
+    width: 90%;
+    max-width: 800px;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.appointments-table th, 
+.appointments-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    color: #333;
+}
+
+.appointments-table th {
+    background: #127137;
+    color: #fff;
+    font-weight: 600;
+}
+
+.appointments-table tr:hover {
+    background-color: #f2f8f5;
+}
+
+.appointments-table .cancel-btn,
+.appointments-table .reschedule-btn {
+    padding: 6px 12px;
+    background-color: #d9534f;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-right: 5px;
+}
+
+.appointments-table .reschedule-btn {
+    background-color: #0275d8;
+}
+
+.appointments-table .cancel-btn:hover {
+    background-color: #c9302c;
+}
+
+.appointments-table .reschedule-btn:hover {
+    background-color: #025aa5;
+}
+
+.appointments-table p {
+    text-align: center;
+    margin-top: 20px;
+    color: #555;
+    font-size: 15px;
+}
+#rescheduleModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#rescheduleModal .modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+#rescheduleModal h3 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #127137;
+}
+
+#rescheduleModal .form-group {
+    margin-bottom: 15px;
+}
+
+#rescheduleModal label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+#rescheduleModal input,
+#rescheduleModal select,
+#rescheduleModal button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+#rescheduleModal button[type="submit"] {
+    background: #127137;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+#rescheduleModal button[type="submit"]:hover {
+    background: #0e5d2c;
+}
+
+#rescheduleModal #closeModal {
+    background: #ccc;
+    color: #333;
+    border: none;
+    cursor: pointer;
+}
+ 
+.swal2-popup.swal2-popup-green {
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    padding: 25px !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}
+
+/* Title */
+.swal2-title {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: #0f9d58 !important; /* Afyacall green */
+    margin-bottom: 20px !important;
+}
+
+/* Labels */
+.reschedule-dialog label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    display: block;
+    text-align: left;
+}
+
+/* Inputs */
+.reschedule-dialog .swal2-input,
+.reschedule-dialog select {
+    width: 100% !important;
+    border: 1px solid #cce3d6 !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    font-size: 14px;
+    margin-bottom: 15px;
+    transition: border 0.3s;
+}
+.reschedule-dialog .swal2-input:focus,
+.reschedule-dialog select:focus {
+    border: 1px solid #0f9d58 !important;
+    outline: none !important;
+}
+
+/* Confirm button (Green) */
+.swal2-confirm {
+    background: linear-gradient(135deg, #1db954, #0f9d58) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    transition: 0.3s ease;
+}
+.swal2-confirm:hover {
+    background: linear-gradient(135deg, red, #b91d22) !important;
+}
+
+/* Cancel button (Pale Green) */
+.swal2-cancel {
+    background: #e9f7ef !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #0f9d58 !important;
+    transition: 0.3s ease;
+}
+.swal2-cancel:hover {
+    background: #d0f0db !important;
+}
+/* Style for date input placeholder */
+.swal2-popup .swal2-input[type="date"] {
+    font-size: 15px;
+    color: #1b5e20; 
+    border: 1px solid #a5d6a7;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f1f8f4;
+}
+
+/* Ensure the placeholder text inside date picker (for unsupported browsers) */
+.swal2-popup .swal2-input[type="date"]::placeholder {
+    color: #66bb6a; 
+    opacity: 1;
+}
+
+/* Style for select dropdown */
+.swal2-popup select {
+    font-size: 15px;
+    color: #1b5e20;
+    border: 1px solid #a5d6a7;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f1f8f4;
+    width: 100%;
+    cursor: pointer;
+}
+
+/* Style for select placeholder option */
+.swal2-popup select option[value=""] {
+    color: #66bb6a;  
+}
+ 
