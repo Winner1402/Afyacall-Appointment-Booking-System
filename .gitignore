@@ -11,3 +11,5 @@ admin
 add_medical_history.php
 composer.json
 composer.lock
+.vscode/
+layout.php

@@ -22,47 +22,40 @@ $appointment_date = $_POST['appointment_date'];
 try {
     $conn->beginTransaction();
 
-    // === SLOT VALIDATION BLOCK ===
-    // Check if slot is available
-    $stmt = $conn->prepare("SELECT id, is_booked, doctor_id, slot_datetime FROM doctor_slots WHERE id = :slot_id FOR UPDATE");
-    $stmt->bindParam(':slot_id', $slot_id, PDO::PARAM_INT);
-    $stmt->execute();
+    // === SLOT VALIDATION ===
+    $stmt = $conn->prepare("
+        SELECT id, slot_datetime, end_datetime 
+        FROM doctor_slots 
+        WHERE id = :slot_id AND doctor_id = :doctor_id 
+          AND status = 0 AND slot_datetime >= NOW()
+        LIMIT 1
+    ");
+    $stmt->execute([
+        ':slot_id' => $slot_id,
+        ':doctor_id' => $doctor_id
+    ]);
     $slot = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$slot) {
         $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Selected slot not found.']);
+        echo json_encode(['status'=>'error','message'=>'Selected slot not found or unavailable.']);
         exit();
     }
 
-    if ((int)$slot['is_booked'] === 1) {
-        $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Selected slot is already booked.']);
-        exit();
-    }
-
-    if ((int)$slot['doctor_id'] !== $doctor_id) {
-        $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Invalid slot for selected doctor.']);
-        exit();
-    }
-
-    // Check if appointment is at least 24 hours in the future
+    // Ensure slot is at least 24 hours in the future
     $slot_time = strtotime($slot['slot_datetime']);
     if ($slot_time - time() < 24*60*60) {
         $conn->rollBack();
         echo json_encode(['status'=>'error','message'=>'Appointment must be booked at least 24 hours in advance.']);
         exit();
     }
-    // === END SLOT VALIDATION BLOCK ===
 
-    // Get patient email and name
+    // === FETCH PATIENT AND DOCTOR DETAILS ===
     $stmtPatient = $conn->prepare("SELECT email, name FROM users WHERE id = :patient_id");
     $stmtPatient->bindParam(':patient_id', $patient_id, PDO::PARAM_INT);
     $stmtPatient->execute();
     $patient = $stmtPatient->fetch(PDO::FETCH_ASSOC);
 
-    // Get doctor details
     $stmtDoctor = $conn->prepare("
         SELECT u.name as doctor_name, s.name as specialty 
         FROM doctors d 
@@ -74,25 +67,25 @@ try {
     $stmtDoctor->execute();
     $doctor = $stmtDoctor->fetch(PDO::FETCH_ASSOC);
 
-    // === SLOT BOOKING AND APPOINTMENT CREATION BLOCK ===
-    // Book the slot
-    $updateSlot = $conn->prepare("UPDATE doctor_slots SET is_booked = 1 WHERE id = :slot_id");
+    // === BOOK THE SLOT ===
+    $updateSlot = $conn->prepare("UPDATE doctor_slots SET status = 1 WHERE id = :slot_id");
     $updateSlot->bindParam(':slot_id', $slot_id, PDO::PARAM_INT);
     $updateSlot->execute();
 
     // Create appointment
-    $insertAppt = $conn->prepare("INSERT INTO appointments (patient_id, doctor_id, slot_id, status, created_at) VALUES (:patient_id, :doctor_id, :slot_id, 'pending', NOW())");
+    $insertAppt = $conn->prepare("
+        INSERT INTO appointments (patient_id, doctor_id, slot_id, status, created_at)
+        VALUES (:patient_id, :doctor_id, :slot_id, 'pending', NOW())
+    ");
     $insertAppt->bindParam(':patient_id', $patient_id, PDO::PARAM_INT);
     $insertAppt->bindParam(':doctor_id', $doctor_id, PDO::PARAM_INT);
     $insertAppt->bindParam(':slot_id', $slot_id, PDO::PARAM_INT);
     $insertAppt->execute();
 
     $appointment_id = $conn->lastInsertId();
-    // === END SLOT BOOKING BLOCK ===
-
     $conn->commit();
 
-    // Send confirmation email using the separated function
+    // Send confirmation email
     $emailSent = sendAppointmentConfirmationEmail(
         $patient['email'],
         $patient['name'],

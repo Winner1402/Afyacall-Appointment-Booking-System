@@ -2,9 +2,9 @@
 session_start();
 include 'config\db.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
+// Check if user is logged in AND is a patient
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'patient') {
+    exit("Unauthorized access");
 }
 
 $patient_id = $_SESSION['user_id'];

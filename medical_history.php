@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'config\db.php';
+include 'config/db.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -10,15 +10,16 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_role = $_SESSION['user_role'] ?? 'patient';
 
-// Fetch patients for doctor/admin to select
+// Fetch patients for doctor/admin to select when adding history
 $patients = [];
-if($user_role == 'doctor' || $user_role == 'admin'){
+if ($user_role == 'doctor' || $user_role == 'admin') {
     $stmt = $conn->query("SELECT id, name FROM users WHERE role='patient'");
     $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Fetch medical history
-if($user_role == 'patient'){
+if ($user_role == 'patient') {
+    // Patient sees only their own history
     $stmt = $conn->prepare("
         SELECT mh.id, mh.title, mh.details, mh.attachment, mh.created_at, u.name AS doctor_name
         FROM medical_history mh
@@ -29,7 +30,22 @@ if($user_role == 'patient'){
     $stmt->bindParam(':patient_id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
     $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} elseif ($user_role == 'doctor') {
+    // Doctor sees only records they added
+    $stmt = $conn->prepare("
+        SELECT mh.id, mh.title, mh.details, mh.attachment, mh.created_at, p.name AS patient_name
+        FROM medical_history mh
+        JOIN users p ON mh.patient_id = p.id
+        WHERE mh.doctor_id = :doctor_id
+        ORDER BY mh.created_at DESC
+    ");
+    $stmt->bindParam(':doctor_id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 } else {
+    // Admin sees all
     $stmt = $conn->query("
         SELECT mh.id, mh.title, mh.details, mh.attachment, mh.created_at, u.name AS doctor_name, p.name AS patient_name
         FROM medical_history mh
@@ -51,7 +67,7 @@ if($user_role == 'patient'){
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
-    .history-table { width: 80%; margin: 0 auto; border-collapse: collapse; }
+    .history-table { width: 80%; margin: 20px auto; border-collapse: collapse; }
     .history-table th, .history-table td { padding: 10px; border: 1px solid #ccc; text-align: left; }
     .history-table th { background-color: #127137; color: #fff; }
     .add-history { width: 80%; margin: 20px auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -76,8 +92,8 @@ if($user_role == 'patient'){
     <aside class="sidebar">
         <ul>
             <li><a href="profile.php">Profile</a></li>
-            <li><a href="booking.php">Book Appointment</a></li>
-            <li><a href="upcoming.php">Upcoming Appointments</a></li>
+            <li><a href="manage_appointments.php">Manage Appointment</a></li>
+            <li><a href="doctor_upcoming.php">Upcoming Appointments</a></li>
             <li><a href="medical_history.php" class="active">Medical History</a></li>
             <li><a href="logout.php">Logout</a></li>
         </ul>
@@ -90,7 +106,6 @@ if($user_role == 'patient'){
         <div class="add-history">
             <h3>Add New History</h3>
             <form id="add-history-form" enctype="multipart/form-data">
-                <?php if($user_role == 'doctor' || $user_role == 'admin'): ?>
                 <div class="form-group">
                     <label for="patient_id">Select Patient</label>
                     <select name="patient_id" id="patient_id" required>
@@ -100,7 +115,6 @@ if($user_role == 'patient'){
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <?php endif; ?>
 
                 <div class="form-group">
                     <label for="title">Title</label>
@@ -123,7 +137,7 @@ if($user_role == 'patient'){
             <thead>
                 <tr>
                     <?php if($user_role != 'patient'): ?><th>Patient</th><?php endif; ?>
-                    <th>Doctor</th>
+                    <?php if($user_role != 'doctor'): ?><th>Doctor</th><?php endif; ?>
                     <th>Title</th>
                     <th>Date</th>
                     <th>Details / Attachment</th>
@@ -133,12 +147,12 @@ if($user_role == 'patient'){
                 <?php foreach($history as $h): ?>
                 <tr>
                     <?php if($user_role != 'patient'): ?><td><?php echo htmlspecialchars($h['patient_name'] ?? ''); ?></td><?php endif; ?>
-                    <td><?php echo htmlspecialchars($h['doctor_name']); ?></td>
+                    <?php if($user_role != 'doctor'): ?><td><?php echo htmlspecialchars($h['doctor_name'] ?? ''); ?></td><?php endif; ?>
                     <td><?php echo htmlspecialchars($h['title']); ?></td>
                     <td><?php echo date('d M Y H:i', strtotime($h['created_at'])); ?></td>
                     <td>
                         <?php echo nl2br(htmlspecialchars($h['details'])); ?>
-                        <?php if($h['attachment']): ?>
+                        <?php if(!empty($h['attachment'])): ?>
                             <br><a href="uploads/<?php echo htmlspecialchars($h['attachment']); ?>" target="_blank">View File</a>
                         <?php endif; ?>
                     </td>

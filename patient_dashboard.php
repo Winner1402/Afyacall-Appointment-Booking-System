@@ -46,11 +46,14 @@ include 'config/db.php';
                 </a>
             </li>
             <li>
-                <a href="medical_history.php">
+                <a href="patient_medical_history.php">
                     <div class="item-media"><i class="ti-medall-alt"></i></div>
                     <div class="item-inner"><span class="title"> Medical History </span></div>
                 </a>
             </li>
+            <li >
+                <a href="logout.php">
+                   Logout </a></li>
         </ul>
     </div>
 

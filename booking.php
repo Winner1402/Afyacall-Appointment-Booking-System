@@ -1,11 +1,7 @@
 <?php
-session_start();
-include 'config\db.php';
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+include 'auth_check.php';
+authorize(['patient']); // Only patients can access
+include 'config/db.php'; // DB connection
 
 $user_id = $_SESSION['user_id'];
 
@@ -18,6 +14,7 @@ $stmt = $conn->prepare("
 ");
 $stmt->execute();
 $doctors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>

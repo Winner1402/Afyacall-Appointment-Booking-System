@@ -191,3 +191,165 @@ form input, form select, form textarea {
         padding: 20px;
     }
 }
+        .appointments-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .appointments-table th {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .appointments-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0f0e0;
+            font-size: 14px;
+        }
+        
+        .appointments-table tr:hover {
+            background-color: #f8fff8;
+        }
+        
+        .appointments-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-confirmed {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-completed {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-accept {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-accept:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-reject {
+            background: linear-gradient(135deg, #ff3860, #e02c51);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-reject:hover {
+            background: linear-gradient(135deg, #e02c51, #c81e3d);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 56, 96, 0.3);
+        }
+        
+        .btn-view {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-view:hover {
+            background: linear-gradient(135deg, #2980b9, #1c6ea4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .patient-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .patient-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .patient-contact {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .no-appointments {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .no-appointments i {
+            font-size: 48px;
+            color: #bdc3c7;
+            margin-bottom: 15px;
+        }
+ 
