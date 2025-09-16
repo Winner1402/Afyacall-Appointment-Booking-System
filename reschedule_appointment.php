@@ -21,146 +21,99 @@ $new_slot_id = (int) $_POST['new_slot_id'];
 try {
     $conn->beginTransaction();
 
-    // Lock appointment row and get old slot + doctor details including slot time
+    // Get current appointment
     $stmt = $conn->prepare("
-        SELECT a.id, a.slot_id, a.doctor_id, a.status, ds.slot_datetime as old_slot_time 
+        SELECT a.id, a.slot_id, a.doctor_id, a.status, ds.slot_datetime AS old_slot_time 
         FROM appointments a 
         JOIN doctor_slots ds ON a.slot_id = ds.id 
-        WHERE a.id = :id AND a.patient_id = :pid FOR UPDATE
+        WHERE a.id=:id AND a.patient_id=:pid FOR UPDATE
     ");
-    $stmt->bindParam(':id', $appointment_id, PDO::PARAM_INT);
-    $stmt->bindParam(':pid', $patient_id, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt->execute([':id'=>$appointment_id, ':pid'=>$patient_id]);
     $appt = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$appt) {
         $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Appointment not found.']);
-        exit();
+        exit(json_encode(['status'=>'error','message'=>'Appointment not found.']));
     }
-    
+
     if ($appt['status'] != 'pending') {
         $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Only pending appointments can be rescheduled.']);
-        exit();
+        exit(json_encode(['status'=>'error','message'=>'Only pending appointments can be rescheduled.']));
     }
 
     $old_slot_id = (int)$appt['slot_id'];
     $doctor_id = (int)$appt['doctor_id'];
     $old_slot_time = $appt['old_slot_time'];
 
-    // Check 24-hour restriction for old appointment
+    // Restrict reschedule within 24 hours
     if (strtotime($old_slot_time) - time() < 24*60*60) {
         $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Cannot reschedule within 24 hours of the appointment.']);
-        exit();
+        exit(json_encode(['status'=>'error','message'=>'Cannot reschedule within 24 hours.']));
     }
 
-    // Lock and validate new slot: must be unbooked and belong to same doctor
+    // Validate new slot (only future slots, not current slot)
     $stmt2 = $conn->prepare("
-        SELECT id, is_booked, doctor_id, slot_datetime 
+        SELECT id, status, doctor_id, slot_datetime 
         FROM doctor_slots 
-        WHERE id = :sid FOR UPDATE
+        WHERE id=:sid 
+          AND doctor_id=:did 
+          AND status=0 
+          AND slot_datetime > NOW() 
+          AND id != :current_slot 
+        FOR UPDATE
     ");
-    $stmt2->bindParam(':sid', $new_slot_id, PDO::PARAM_INT);
-    $stmt2->execute();
+    $stmt2->execute([
+        ':sid'=>$new_slot_id,
+        ':did'=>$doctor_id,
+        ':current_slot'=>$old_slot_id
+    ]);
     $newSlot = $stmt2->fetch(PDO::FETCH_ASSOC);
 
     if (!$newSlot) {
         $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Selected slot not found.']);
-        exit();
-    }
-    
-    if ((int)$newSlot['doctor_id'] !== $doctor_id) { 
-        $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Selected slot does not belong to the same doctor.']);
-        exit();
-    }
-    
-    if ((int)$newSlot['is_booked'] === 1) {
-        $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Selected slot is already booked.']);
-        exit();
-    }
-
-    // Check if new slot is within 24 hours from now
-    $new_slot_time = $newSlot['slot_datetime'];
-    if (strtotime($new_slot_time) - time() < 24*60*60) {
-        $conn->rollBack();
-        echo json_encode(['status'=>'error','message'=>'Cannot reschedule to a slot within 24 hours from now.']);
-        exit();
+        exit(json_encode(['status'=>'error','message'=>'Invalid slot selected. Choose a future available slot.']));
     }
 
     // Free old slot
-    $updOld = $conn->prepare("UPDATE doctor_slots SET is_booked = 0 WHERE id = :old_id");
-    $updOld->bindParam(':old_id', $old_slot_id, PDO::PARAM_INT);
-    $updOld->execute();
+    $conn->prepare("UPDATE doctor_slots SET status=0 WHERE id=:old_id")
+         ->execute([':old_id'=>$old_slot_id]);
 
     // Book new slot
-    $updNew = $conn->prepare("UPDATE doctor_slots SET is_booked = 1 WHERE id = :new_id");
-    $updNew->bindParam(':new_id', $new_slot_id, PDO::PARAM_INT);
-    $updNew->execute();
+    $conn->prepare("UPDATE doctor_slots SET status=1 WHERE id=:new_id")
+         ->execute([':new_id'=>$new_slot_id]);
 
     // Update appointment
-    $updAppt = $conn->prepare("
-        UPDATE appointments 
-        SET slot_id = :new_slot_id, updated_at = NOW() 
-        WHERE id = :appt_id
-    ");
-    $updAppt->bindParam(':new_slot_id', $new_slot_id, PDO::PARAM_INT);
-    $updAppt->bindParam(':appt_id', $appointment_id, PDO::PARAM_INT);
-    $updAppt->execute();
+    $conn->prepare("UPDATE appointments SET slot_id=:new_slot_id, updated_at=NOW() WHERE id=:appt_id")
+         ->execute([':new_slot_id'=>$new_slot_id, ':appt_id'=>$appointment_id]);
 
-    // Get patient and doctor details for email
-    $stmtPatient = $conn->prepare("
-        SELECT u.email, u.name 
-        FROM users u 
-        WHERE u.id = :patient_id
-    ");
-    $stmtPatient->bindParam(':patient_id', $patient_id, PDO::PARAM_INT);
-    $stmtPatient->execute();
+    // Get patient + doctor details
+    $stmtPatient = $conn->prepare("SELECT email, name FROM users WHERE id=:pid");
+    $stmtPatient->execute([':pid'=>$patient_id]);
     $patient = $stmtPatient->fetch(PDO::FETCH_ASSOC);
 
-    $stmtDoctor = $conn->prepare("
-        SELECT u.name as doctor_name 
-        FROM doctors d 
-        JOIN users u ON d.user_id = u.id 
-        WHERE d.id = :doctor_id
-    ");
-    $stmtDoctor->bindParam(':doctor_id', $doctor_id, PDO::PARAM_INT);
-    $stmtDoctor->execute();
+    $stmtDoctor = $conn->prepare("SELECT u.name as doctor_name FROM doctors d JOIN users u ON d.user_id=u.id WHERE d.id=:did");
+    $stmtDoctor->execute([':did'=>$doctor_id]);
     $doctor = $stmtDoctor->fetch(PDO::FETCH_ASSOC);
 
     $conn->commit();
 
-    // Send reschedule confirmation email
+    // Send confirmation email
     $emailSent = sendRescheduleConfirmationEmail(
         $patient['email'],
         $patient['name'],
         $doctor['doctor_name'],
         $old_slot_time,
-        $new_slot_time
+        $newSlot['slot_datetime']
     );
 
-    if ($emailSent) {
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'Appointment rescheduled successfully. Confirmation email sent.'
-        ]);
-    } else {
-        echo json_encode([
-            'status' => 'success',
-            'message' => 'Appointment rescheduled successfully. (Email notification failed)'
-        ]);
-    }
+    echo json_encode([
+        'status'=>'success',
+        'message'=>'Appointment rescheduled successfully.' . ($emailSent ? ' Confirmation email sent.' : ' Email failed.')
+    ]);
 
 } catch (Exception $e) {
     $conn->rollBack();
-    error_log("Reschedule error: " . $e->getMessage());
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Server error: Please try again later.'
-    ]);
+    error_log("Reschedule error: ".$e->getMessage());
+    echo json_encode(['status'=>'error','message'=>'Server error: Please try again later.']);
 }
 ?>

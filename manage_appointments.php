@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['app
     exit();
 }
 
-// ✅ Fetch all upcoming appointments
+// ✅ Fetch all upcoming appointments for this doctor
 $query = "
     SELECT a.id AS appointment_id,
            u.name AS patient_name,
@@ -65,38 +65,25 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Manage Appointments</title>
     <link rel="stylesheet" href="assets/css/patient_dashboard.css">
     <style>
-    .btn-accept, .btn-reject {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-        color: #fff;
-        transition: background 0.3s, transform 0.2s;
-        margin-right: 5px;
-    }
-
-    .btn-accept {
-        background-color: #28a745; /* Green */
-    }
-
-    .btn-accept:hover {
-        background-color: #218838;
-        transform: scale(1.05);
-    }
-
-    .btn-reject {
-        background-color: #dc3545; /* Red */
-    }
-
-    .btn-reject:hover {
-        background-color: #c82333;
-        transform: scale(1.05);
-    }
-
-    form {
-        display: inline-block; /* keeps forms side by side */
-    }
+        .btn-accept, .btn-reject {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #fff;
+            transition: background 0.3s, transform 0.2s;
+            margin-right: 5px;
+        }
+        .btn-accept { background-color: #28a745; }
+        .btn-accept:hover { background-color: #218838; transform: scale(1.05); }
+        .btn-reject { background-color: #dc3545; }
+        .btn-reject:hover { background-color: #c82333; transform: scale(1.05); }
+        .status-pending { color: orange; font-weight: 600; }
+        .status-accepted { color: green; font-weight: 600; }
+        .status-rejected { color: red; font-weight: 600; }
+        .status-unknown { color: gray; font-style: italic; }
+        form { display: inline-block; }
     </style>
 </head>
 <body>
@@ -110,7 +97,7 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <aside class="sidebar">
         <ul>
             <li><a href="doctor_dashboard.php">Home</a></li>
-             <li><a href="doctor_upcoming.php">Upcoming Appointments</a></li>
+            <li><a href="doctor_upcoming.php">Upcoming Appointments</a></li>
             <li><a href="doctor_history.php">Appointment History</a></li>
             <li><a href="doctor_profile.php">My Profile</a></li>
             <li><a href="logout.php">Logout</a></li>
@@ -143,14 +130,24 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?php echo htmlspecialchars($appt['patient_email']); ?></td>
                         <td><?php echo htmlspecialchars($appt['patient_phone']); ?></td>
                         <td><?php echo date("d M Y H:i", strtotime($appt['slot_datetime'])); ?></td>
-                        <td><?php echo ucfirst(htmlspecialchars($appt['status'])); ?></td>
                         <td>
-                            <?php if ($appt['status'] === 'pending'): ?>
-                                <form method="post" style="display:inline;">
+                            <?php
+                            $status = strtolower(trim($appt['status'] ?? 'unknown'));
+                            switch ($status) {
+                                case 'pending': echo "<span class='status-pending'>Pending</span>"; break;
+                                case 'accepted': echo "<span class='status-accepted'>Accepted</span>"; break;
+                                case 'rejected': echo "<span class='status-rejected'>Rejected</span>"; break;
+                                default: echo "<span class='status-unknown'>Not Updated</span>"; break;
+                            }
+                            ?>
+                        </td>
+                        <td>
+                            <?php if ($status === 'pending'): ?>
+                                <form method="post">
                                     <input type="hidden" name="appointment_id" value="<?php echo $appt['appointment_id']; ?>">
                                     <button type="submit" name="action" value="accept" class="btn-accept">Accept</button>
                                 </form>
-                                <form method="post" style="display:inline;">
+                                <form method="post">
                                     <input type="hidden" name="appointment_id" value="<?php echo $appt['appointment_id']; ?>">
                                     <button type="submit" name="action" value="reject" class="btn-reject">Reject</button>
                                 </form>

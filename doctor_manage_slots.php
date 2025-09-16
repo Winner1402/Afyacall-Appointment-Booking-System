@@ -18,6 +18,18 @@ if(!$doctor){
 }
 $doctor_id = $doctor['id'];
 
+//  Delete past slots safely (only if no appointments exist)
+$delete_safe = $conn->prepare("
+    DELETE ds
+    FROM doctor_slots ds
+    LEFT JOIN appointments a ON ds.id = a.slot_id
+    WHERE ds.doctor_id = :doctor_id
+      AND ds.slot_datetime < NOW()
+      AND a.id IS NULL
+");
+$delete_safe->bindParam(':doctor_id', $doctor_id, PDO::PARAM_INT);
+$delete_safe->execute();
+
 // Fetch existing slots
 $stmt = $conn->prepare("
     SELECT id, slot_datetime, end_datetime, status

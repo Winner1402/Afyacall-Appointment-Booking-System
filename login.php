@@ -24,14 +24,21 @@ session_start();
           <input type="text" name="email" placeholder="Email" required>
         </div>
         <!-- Password -->
-        <div class="input-group">
-          <img src="assets/icons/lock.png" alt="Password Icon">
-           <input type="password" name="password" placeholder="Password" 
+<div class="input-group">
+  <img src="assets/icons/lock.png" alt="Password Icon">
+  <input type="password" name="password" placeholder="Password" 
          required minlength="6" maxlength="20" 
          title="Password must be between 6 and 20 characters">
-        </div>
-        <!-- Login Button -->
-        <button type="submit" class="btn-primary">Login</button>
+</div>
+
+<!-- Forgot Password Link -->
+<div class="forgot-password">
+    <a href="forgot_password.php">Forgot Password?</a>
+</div>
+
+<!-- Login Button -->
+<button type="submit" class="btn-primary">Login</button>
+
       </form>
       <!-- Register Link -->
       <div class="register-link">

@@ -91,7 +91,7 @@ if ($user_role == 'patient') {
 <div class="container">
     <aside class="sidebar">
         <ul>
-            <li><a href="profile.php">Profile</a></li>
+            <li><a href="doctor_profile.php">Profile</a></li>
             <li><a href="manage_appointments.php">Manage Appointment</a></li>
             <li><a href="doctor_upcoming.php">Upcoming Appointments</a></li>
             <li><a href="medical_history.php" class="active">Medical History</a></li>

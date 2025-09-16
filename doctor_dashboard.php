@@ -77,9 +77,16 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <li>
                 <a href="doctor_profile.php">
                     <div class="item-media"><i class="ti-id-badge"></i></div>
-                    <div class="item-inner"><span class="title">Profile</span></div>
+                    <div class="item-inner"><span class="title"> My Profile</span></div>
                 </a>
             </li>
+            <li>
+    <a href="change_password.php">
+        <div class="item-media"><i class="ti-key"></i></div>
+        <div class="item-inner"><span class="title">Change Password</span></div>
+    </a>
+</li>
+
             <li>
                 <a href="logout.php">
                     <div class="item-media"><i class="ti-power-off"></i></div>
@@ -113,49 +120,7 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
         </section>
 
-        <h2>Upcoming Appointments</h2>
-        <?php if(count($appointments) > 0): ?>
-            <table class="appointments-table">
-                <thead>
-                    <tr>
-                        <th>Patient</th>
-                        <th>Specialty</th>
-                        <th>Date & Time</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach($appointments as $a):
-                        $slot_time = strtotime($a['slot_datetime']);
-                        $now = time();
-                        $cutoff = 24 * 60 * 60; // 24h
-                        $can_modify = ($slot_time - $now) > $cutoff && $a['status'] == 'pending';
-                    ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($a['patient_name']); ?></td>
-                        <td><?php echo htmlspecialchars($a['specialty_name']); ?></td>
-                        <td><?php echo date('d M Y H:i', strtotime($a['slot_datetime'])); ?></td>
-                        <td><?php echo ucfirst($a['status']); ?></td>
-                        <td>
-                            <?php if($can_modify): ?>
-                                <button class="cancel-btn" data-id="<?php echo $a['appointment_id']; ?>">Cancel</button>
-                                <button class="reschedule-btn"
-                                    data-id="<?php echo $a['appointment_id']; ?>"
-                                    data-slot="<?php echo $a['slot_id']; ?>">
-                                    Reschedule
-                                </button>
-                            <?php else: ?>
-                                -
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php else: ?>
-            <p>No upcoming appointments.</p>
-        <?php endif; ?>
+        
     </main>
 </div>
 

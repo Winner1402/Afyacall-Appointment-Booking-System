@@ -1,7 +1,7 @@
 <?php
 session_start();
-include 'config\db.php';
-require_once 'includes/email_functions.php'; // Include email functions
+include 'config/db.php';
+require_once 'includes/email_functions.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'], $_POST['appointment_id'])){
@@ -10,12 +10,12 @@ if (!isset($_SESSION['user_id'], $_POST['appointment_id'])){
 }
 
 $patient_id = $_SESSION['user_id'];
-$appointment_id = $_POST['appointment_id'];
+$appointment_id = (int)$_POST['appointment_id'];
 
 try {
     $conn->beginTransaction();
 
-    // Fetch appointment and slot with more details for email
+    // Fetch appointment + slot details
     $stmt = $conn->prepare("
         SELECT 
             a.slot_id, 
@@ -33,9 +33,7 @@ try {
         WHERE a.id = :appointment_id AND a.patient_id = :patient_id
         FOR UPDATE
     ");
-    $stmt->bindParam(':appointment_id', $appointment_id, PDO::PARAM_INT);
-    $stmt->bindParam(':patient_id', $patient_id, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt->execute([':appointment_id'=>$appointment_id, ':patient_id'=>$patient_id]);
     $appt = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if(!$appt){
@@ -61,19 +59,16 @@ try {
     }
 
     // Update appointment status
-    $update_appt = $conn->prepare("UPDATE appointments SET status='cancelled', updated_at=NOW() WHERE id=:appointment_id");
-    $update_appt->bindParam(':appointment_id', $appointment_id, PDO::PARAM_INT);
-    $update_appt->execute();
+    $conn->prepare("UPDATE appointments SET status='cancelled', updated_at=NOW() WHERE id=:appointment_id")
+         ->execute([':appointment_id'=>$appointment_id]);
 
     // Free up the slot
-    $update_slot = $conn->prepare("UPDATE doctor_slots SET is_booked=0 WHERE id=:slot_id");
-    $update_slot->bindParam(':slot_id', $appt['slot_id'], PDO::PARAM_INT);
-    $update_slot->execute();
+    $conn->prepare("UPDATE doctor_slots SET status=0 WHERE id=:slot_id")
+         ->execute([':slot_id'=>$appt['slot_id']]);
 
     $conn->commit();
-  
-    // Send cancellation confirmation email
 
+    // Send cancellation email
     $emailSent = sendCancellationConfirmationEmail(
         $appt['patient_email'],
         $appt['patient_name'],
@@ -81,21 +76,14 @@ try {
         $appt['slot_datetime']
     );
 
-    if ($emailSent) {
-        echo json_encode([
-            'status'=>'success',
-            'message'=>'Appointment cancelled successfully. Confirmation email sent.'
-        ]);
-    } else {
-        echo json_encode([
-            'status'=>'success',
-            'message'=>'Appointment cancelled successfully. (Email notification failed)'
-        ]);
-    }
+    echo json_encode([
+        'status'=>'success',
+        'message'=>'Appointment cancelled successfully.' . ($emailSent ? ' Confirmation email sent.' : ' Email notification failed.')
+    ]);
 
 } catch (Exception $e){
     $conn->rollBack();
     error_log("Cancellation error: " . $e->getMessage());
-    echo json_encode(['status'=>'error','message'=>'Error: Please try again later.']);
+    echo json_encode(['status'=>'error','message'=>'Server error. Please try again later.']);
 }
 ?>
