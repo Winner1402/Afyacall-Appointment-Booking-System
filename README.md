@@ -101,5 +101,16 @@ Access the system via:
 http://localhost/Afyacall 
 
 
- 
- 
+ ## Login Credentials
+
+### Admin
+- **Email:** admin@afyacall.com
+- **Password:** Admin@2025
+
+### Doctor
+- **Email:** doctor@afyacall.com
+- **Password:** Doctor@2025
+
+### Patient
+- **Email:** patient@gmail.com
+- **Password:** Patient@2025

@@ -100,7 +100,7 @@ button:hover { background: #0e5d2c; }
         </div>
         <button type="submit">Change Password</button>
     </form>
-    <a href="patient_dashboard.php" class="back-btn">Back to Dashboard</a>
+    <a href="admin_dashboard.php" class="back-btn">Back to Dashboard</a>
 </div>
 
 <script>

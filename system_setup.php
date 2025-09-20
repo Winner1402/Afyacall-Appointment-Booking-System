@@ -40,10 +40,10 @@ button:hover { background:#0e5d2c; }
 <body>
 
 <header class="page-header">
-    <img src="assets/images/logo.jpeg" alt="Logo" class="logo">
+    <img src="assets/images/logo.png" alt="Logo" class="logo">
     <h1><?php echo htmlspecialchars($_SESSION['user_name']); ?></h1>
      <button type="button" onclick="window.history.back();" style="padding:10px 15px; background:#127137; color:#fff; width: 100px; border:none; border-radius:6px; cursor:pointer;">
-    ← Back
+    Back
 </button>
 
 </header>
